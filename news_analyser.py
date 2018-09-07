@@ -79,7 +79,6 @@ def modelling(df):
 
 
 def news_analysis(rdd):
-    print("**********", rdd.collect())
     if not rdd.isEmpty():
         spark = _get_spark(rdd.context.getConf())
         df = spark.createDataFrame(rdd)
@@ -105,30 +104,12 @@ def news_analysis(rdd):
 
 def start():
     '''initiate process'''
-    sc = SparkContext(master="local[*]", appName="News_Analyser")
-    sc.setLogLevel("ERROR")
-    ssc  = StreamingContext(sc, 3)
-    flume_strm = FlumeUtils.createStream(ssc, "localhost", 9999)
-    #flume_strm.pprint()
-    lines = flume_strm.map(lambda v: json.loads(v[1]))
+    sc = SparkContext(appName="News_Analyser")
+    ssc  = StreamingContext(sc, 300)
+    f_stream = FlumeUtils.createStream(ssc, "localhost", 9999)
+    lines = f_stream.map(lambda v: json.loads(v[1]))
     lines.pprint()
-    # counts = lines.flatMap(lambda line: line.split(" ")) \
-    #     .map(lambda word: (word, 1)) \
-    #     .reduceByKey(lambda a, b: a + b)
-    # counts.pprint()
-    # print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    # f_stream = FlumeUtils.createStream(ssc, "localhost", 9999)
-    # print("&&&&&&&&&&&&&", f_stream)
-    # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    # lines = f_stream.map(lambda v: json.loads(v[1]))
-    # print("#######################################################################")
-    # lines.pprint()
-    # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    #lines = sc.parallelize([1, 2, 3])
-    # try:
-    #     lines.foreachRDD(news_analysis)
-    # except Exception:
-    #     pass
+    lines.foreachRDD(news_analysis)
 
     ssc.start()
     ssc.awaitTermination()
