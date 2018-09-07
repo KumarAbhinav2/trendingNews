@@ -1,0 +1,41 @@
+
+
+This Mini project showcase you the use use of spark streaming and mllib in order to fetch the latest most trending news
+int the market. There are three major components of this project :
+
+1) Process to collect news items from different sources (CNN, reddit etc).
+2) Flume Process to stream those news item and supply to spark.
+3) Spark to read down stream contents and process those news items using LDA clustering algorithm.
+
+
+Techs Stacks used:
+1) Python
+2) Flume
+3) Spark streaming
+4) Spark mllib
+5) mysql
+
+Prerequisites:
+
+1) mysql(with required tables ready)
+2) flume installed
+3) feedparser python library
+4) bs4 python library
+5) LDA cluste, ring algorithm
+
+
+STEPS TO EXECUTE:
+
+1) Initiate Python news collector via flume
+
+bin/flume-ng agent --conf conf --conf-file libexec/conf/flume_agents.conf --name newsAgent -Dflume.root.logger=INFO,console
+
+
+2) Start spark process:
+
+
+spark-submit --packages org.apache.spark:spark-streaming-flume_2.11:2.2.0  PycharmProjects/RND/python_projects/trending_news_analyser/news_analyser.py
+
+
+3) You should be getting the trending news/topics in the resultant table
+
